@@ -96,9 +96,9 @@ class SQLTable(tables.Table):
 
             dbconn = sqlite3.connect(":memory:")
             loader = Xls2Sql(dbconn)
-            loader.load(self.options.get("source", "data.xlsx"))
+            loader.load(os.path.abspath(self.options.get("source", "data.xlsx")))
         else:
-            default_src = 'database="data.xlsx",driver="xslx"'
+            #default_src = 'database="data.xlsx",driver="xslx"'
             default_src = 'database="csv-data",driver="csv"'
             exec("import %s as DBDRV" % self.options.get("driver", "SnakeSQL"))
             cnstr = "dbconn = DBDRV.connect(%s)" % self.options.get(
