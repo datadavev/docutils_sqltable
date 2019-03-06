@@ -41,7 +41,7 @@ class SQLTable(tables.Table):
         "stub-columns": directives.nonnegative_int,
         "class": directives.class_option,
         "driver": directives.unchanged_required,
-        "source": directives.unchanged_required,
+        "source": directives.path,
         "sql": directives.unchanged_required,
     }
 
@@ -94,6 +94,8 @@ class SQLTable(tables.Table):
         """
         # Load the specified driver and get a connection to the database
         driver = self.options.get("driver", "xlsx")
+        source_dir = os.path.dirname(
+            os.path.abspath(self.state.document.current_source))
         if driver == "xlsx":
             # Load content to an in-memory SQLite database.
             # Yeah, it's ugly, but it works pretty well actually.
@@ -102,7 +104,9 @@ class SQLTable(tables.Table):
 
             dbconn = sqlite3.connect(":memory:")
             loader = Xls2Sql(dbconn)
-            loader.load(os.path.abspath(self.options.get("source", "data.xlsx")))
+            source_path = os.path.normpath(os.path.join(source_dir, self.options.get("source", "data.xlsx")))
+            source_path = utils.relative_path(None, source_path)
+            loader.load(os.path.abspath(source_path))
         else:
             #default_src = 'database="data.xlsx",driver="xslx"'
             default_src = 'database="csv-data",driver="csv"'
