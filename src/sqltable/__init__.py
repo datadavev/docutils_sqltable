@@ -55,8 +55,13 @@ class SQLTable(tables.Table):
             title, messages = self.make_title()
             table_body, max_cols = self.get_sql_data()
             table_head = self.process_header_option()
-            col_widths_s = self.get_column_widths(max_cols)
-            col_widths = [int(wid) for wid in col_widths_s]
+            col_widths = self.get_column_widths(max_cols)
+            # hack until figure out change in docutils
+            try:
+                a = int(col_widths[0])
+            except ValueError as e:
+                col_widths = self.get_column_widths(max_cols)[1]
+
             self.check_table_dimensions(table_body, 0, stub_columns)
             self.extend_short_rows_with_empty_cells(max_cols, (table_head, table_body))
         except SystemMessagePropagation as detail:
